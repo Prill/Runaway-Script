@@ -9,7 +9,7 @@ MINIMUM_PCPU = 10.0
 #print u"\u00bb"
 hostname =  subprocess.Popen(["hostname", "-f"], stdout=subprocess.PIPE).stdout.read().strip()
 print "Printing processes on <" + unicode(hostname)+ "> with a minimum %CPU of", MINIMUM_PCPU
-p = subprocess.Popen(['ps','-eo', 'pcpu,pid,ruser,comm,etime,ni'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+p = subprocess.Popen(['ps','-eo', 'pcpu,pmem,pid,ruser,comm,etime,ni'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 for line in p.stdout.readlines():
 	stripped_line = line.strip()
 	#print stripped_line
