@@ -6,6 +6,13 @@ import subprocess
 # The minimum PCPU value for the process to be considered "bad"
 MINIMUM_PCPU = 10.0
 
+# The minimum time the process can have been running for us to consider it a runaway (in minutes)
+MINIMUM_TIME = 120 
+
+# The minimum pmem (%)
+MINIMUM_PMEM = 10.0
+
+
 #print u"\u00bb"
 hostname =  subprocess.Popen(["hostname", "-f"], stdout=subprocess.PIPE).stdout.read().strip()
 print "Printing processes on <" + unicode(hostname)+ "> with a minimum %CPU of", MINIMUM_PCPU
