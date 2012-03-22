@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright 2011,2012 Max W. Schwarz
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,14 +30,21 @@ MINIMUM_PMEM = 10.0
 
 #print u"\u00bb"
 hostname =  subprocess.Popen(["hostname", "-f"], stdout=subprocess.PIPE).stdout.read().strip()
-print "Printing processes on <" + unicode(hostname)+ "> with a minimum %CPU of", MINIMUM_PCPU
-p = subprocess.Popen(['ps','-eo', 'pcpu,pmem,pid,ruser,comm,etime,ni'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+print "Printing processes on <" + unicode(hostname) + ">" # with a minimum %CPU of", MINIMUM_PCPU
+p = subprocess.Popen(['ps','--no-headers', '-eo','pcpu,pmem,pid,ruser,comm,etime,ni'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 for line in p.stdout.readlines():
-	stripped_line = line.strip()
-	#print stripped_line
-	m = re.match(r"^\W*(\d+\.\d+)",stripped_line)
-	if m:
-		pcpu = float(m.group(1))
-		if pcpu > MINIMUM_PCPU:
-			print "\t"+stripped_line
+    stripped_line = line.strip()
+    #print stripped_line
+    m = re.match(r"^\W*(\d+\.\d+)",stripped_line)
+
+    psData = re.match(r"^(?P<pcpu>\S+)\s+(?P<pmem>\S)\s+",stripped_line)
+    if psData:
+        pcpu = float(psData.group("pcpu"))
+        pmem = float(psData.group("pmem"))
+        if pcpu > MINIMUM_PCPU or pmem > MINIMUM_PMEM:
+            print "\t"+stripped_line
+    # if m:
+    # 	pcpu = float(m.group(1))
+    # 	if pcpu > MINIMUM_PCPU:
+    # 		print "\t"+stripped_line
 
