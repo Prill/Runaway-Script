@@ -37,14 +37,15 @@ for line in p.stdout.readlines():
     #print stripped_line
     m = re.match(r"^\W*(\d+\.\d+)",stripped_line)
 
-    psData = re.match(r"^(?P<pcpu>\S+)\s+(?P<pmem>\S)\s+",stripped_line)
+    psData = re.match(r"^(?P<pcpu>\S+)\s+(?P<pmem>\S+)\s+(?P<pid>\S+)\s+(?P<ruser>\S+)\s+(?P<comm>\S+)\s+(?P<etime>\S+)\s+(?P<ni>\S+)",stripped_line)
     if psData:
-        pcpu = float(psData.group("pcpu"))
-        pmem = float(psData.group("pmem"))
-        if pcpu > MINIMUM_PCPU or pmem > MINIMUM_PMEM:
-            print "\t"+stripped_line
-    # if m:
-    # 	pcpu = float(m.group(1))
-    # 	if pcpu > MINIMUM_PCPU:
-    # 		print "\t"+stripped_line
+        parsedData = {}
+        parsedData["pcpu"] = float(psData.group("pcpu"))
+        parsedData["pmem"] = float(psData.group("pmem"))
+        parsedData["pid "] = int(psData.group("pid"))
+        parsedData["ruser"] = psData.group("ruser")
 
+        if parsedData["pcpu"] > MINIMUM_PCPU or parsedData["pmem"] > MINIMUM_PMEM:
+            print "\t"+stripped_line
+    else:
+        print "Error: No data matched"
