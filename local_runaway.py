@@ -63,7 +63,8 @@ for line in p.stdout.readlines():
 
         if ( parsedData["pcpu"] > MINIMUM_PCPU 
              or parsedData["pmem"] > MINIMUM_PMEM 
-             or parsedData["etime"] > MINIMUM_ETIME):
+            # or parsedData["etime"] > MINIMUM_ETIME
+             ):
             print "\t"+stripped_line
     else:
         print "Error: No data matched"
