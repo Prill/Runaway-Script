@@ -27,15 +27,28 @@ MINIMUM_TIME = 120
 # The minimum pmem (%)
 MINIMUM_PMEM = 10.0
 
+# Minimum elapsed time (in minutes)
+MINIMUM_ETIME = 60*2
 
-#print u"\u00bb"
+# Parses the etime field. This is always in the form DAYS-HOURS:MINUTES:SECONDS. DAYS and HOURS may not be present 
+# Returns the elapsed time in minutes
+def parseTime(etimeString):
+    regexTime = re.match(r"^((?P<days>\d*)-)*((?P<hours>\d*):)*(?P<mins>\d+):(?P<secs>\d+)$", etimeString).groupdict()
+    # print regexTime
+    days = hours = minutes = 0
+    if regexTime["days"]:
+        days = int(regexTime["days"])
+    if regexTime["hours"]:
+        hours = int(regexTime["hours"]) + 24*days
+    minutes = int(regexTime["mins"]) + 60*hours
+    return minutes
+
 hostname =  subprocess.Popen(["hostname", "-f"], stdout=subprocess.PIPE).stdout.read().strip()
 print "Printing processes on <" + unicode(hostname) + ">" # with a minimum %CPU of", MINIMUM_PCPU
 p = subprocess.Popen(['ps','--no-headers', '-eo','pcpu,pmem,pid,ruser,comm,etime,ni'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 for line in p.stdout.readlines():
     stripped_line = line.strip()
-    #print stripped_line
-    m = re.match(r"^\W*(\d+\.\d+)",stripped_line)
+    # print stripped_line
 
     psData = re.match(r"^(?P<pcpu>\S+)\s+(?P<pmem>\S+)\s+(?P<pid>\S+)\s+(?P<ruser>\S+)\s+(?P<comm>\S+)\s+(?P<etime>\S+)\s+(?P<ni>\S+)",stripped_line)
     if psData:
@@ -44,8 +57,14 @@ for line in p.stdout.readlines():
         parsedData["pmem"] = float(psData.group("pmem"))
         parsedData["pid "] = int(psData.group("pid"))
         parsedData["ruser"] = psData.group("ruser")
+        parsedData["etime"] = int(parseTime(psData.group("etime")))
+        
+        # print parsedData["etime"]
 
-        if parsedData["pcpu"] > MINIMUM_PCPU or parsedData["pmem"] > MINIMUM_PMEM:
+        if ( parsedData["pcpu"] > MINIMUM_PCPU 
+             or parsedData["pmem"] > MINIMUM_PMEM 
+             or parsedData["etime"] > MINIMUM_ETIME):
             print "\t"+stripped_line
     else:
         print "Error: No data matched"
+
