@@ -43,13 +43,15 @@ def parseTime(etimeString):
 
 hostname =  subprocess.Popen(["hostname", "-f"], stdout=subprocess.PIPE).stdout.read().strip()
 print "Printing processes on <" + unicode(hostname) + ">" # with a minimum %CPU of", MINIMUM_PCPU
-p = subprocess.Popen(['ps','--no-headers', '-eo','pcpu,pmem,pid,ruser,comm,etime,ni'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+p = subprocess.Popen(['ps','--no-headers', '-eo','pcpu,pmem,pid,ruser,etime,ni,comm'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 for line in p.stdout.readlines():
     stripped_line = line.strip()
     # print stripped_line
 
-    psData = re.match(r"^(?P<pcpu>\S+)\s+(?P<pmem>\S+)\s+(?P<pid>\S+)\s+(?P<ruser>\S+)\s+(?P<comm>\S+)\s+(?P<etime>\S+)\s+(?P<ni>\S+)",stripped_line)
+    psData = re.match(r"^(?P<pcpu>\S+)\s+(?P<pmem>\S+)\s+(?P<pid>\S+)\s+(?P<ruser>\S+)\s+(?P<etime>\S+)\s+(?P<ni>\S+)\s+(?P<comm>.+)$",stripped_line)
     if psData:
+        # print psData.groupdict()
+
         parsedData = {}
         parsedData["pcpu"] = float(psData.group("pcpu"))
         parsedData["pmem"] = float(psData.group("pmem"))
